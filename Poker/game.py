@@ -254,7 +254,7 @@ class Game(Tk):
             choice = askyesno('All In', 'Would you like to bet all of your bank?')
             
             if choice == True:
-                self.__bet.set(self.__player.chips)
+                self.__bet.set(self.__bet.get() + self.__player.chips)
                 self.__player.chips = 0
                 
                 self.__update_info()
