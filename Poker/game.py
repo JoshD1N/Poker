@@ -6,7 +6,7 @@ game
 This file contains the logic and window handling of the main game
 '''
 
-if __name__ == '__main__' or __name__ == 'window':
+if __name__ == '__main__' or __name__ == 'game':
     from setup import *
     from player import Player
     from card import Card
