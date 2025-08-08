@@ -2,7 +2,7 @@
 Josha Cirbo
 08/03/2025
 CSC2017 Advanced Python
-setup
+__init__
 This file is necessary for Poker to be run as a package
 '''
 

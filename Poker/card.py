@@ -85,7 +85,7 @@ class Card:
             self.__master.after_cancel(animation_id)
             self.__switch = False
             
-            # Set current, unstretched face to dummy variable
+            # Assign dummy variable current, unstretched face
             self.__current = side.subsample(1, 1)
             self.__master.itemconfigure(self.__image, image=self.__current)
             
