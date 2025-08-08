@@ -343,29 +343,28 @@ class Game(Tk):
             showerror('ERROR', err.args[0])
     
     def __reset(self):
-        self.__player.clear()
-        self.__dealt = False
-        self.__finished = False
-        self.__score = None
-        self.__running = False
-        
-        self.__cards_to_discard.clear()
-        
-        self.__reset_selections()
-        
-        # Save bank to file after every turn incase of unexpected program termination
-        self.__player.save_bankroll()
-        
-        # If auto bet is set, check to make sure there are chips in player's bank
-        if self.__auto_bet.get() and self.__player.chips > 0:
-            if self.__auto_bet_amount > self.__player.chips:
-                self.__bet.set(self.__player.chips)
-            else:
-                self.__bet.set(self.__auto_bet_amount)
-        else:
+        try:
+            self.__player.clear()
+            self.__dealt = False
+            self.__finished = False
+            self.__score = None
+            self.__running = False
+            
+            self.__cards_to_discard.clear()
+            
+            self.__reset_selections()
+            
+            # Save bank to file after every turn incase of unexpected program termination
+            self.__player.save_bankroll()
+            
+            # Set bet to zero and check if there is an auto bet
             self.__bet.set(0)
-        
-        self.__update_info()
+            self.__set_bet()
+            
+            self.__update_info()
+        except Exception as err:
+            showerror('ERROR', f'Fatal error: {err.args[0]}')
+            self.destoy()
     
     def __update_info(self):
         self.__player_info.set(str(self.__player) + f'\n{'BET':>4} {self.__bet.get()}')
@@ -389,8 +388,19 @@ class Game(Tk):
         else:
             if self.__auto_bet.get():
                 self.__auto_bet_amount = simpledialog.askinteger('Auto Bet', 'How much would you like to auto bet', minvalue=0, maxvalue=50)
-                self.__bet.set(self.__auto_bet_amount if not self.__bet.get() else self.__bet.get())
+                
+                self.__set_bet()
+                
                 self.__update_info()
+    
+    def __set_bet(self):
+        if self.__auto_bet.get() and self.__player.chips and not self.__bet.get():
+            if self.__auto_bet_amount > self.__player.chips:
+                self.__bet.set(self.__player.chips)
+                self.__player.chips = 0
+            else:
+                self.__bet.set(self.__auto_bet_amount)
+                self.__player.chips -= self.__auto_bet_amount
     
     def __reset_selections(self):
         # Turn 'discard' into 'keep' and make text same color as background
