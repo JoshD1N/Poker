@@ -298,6 +298,8 @@ class Game(Tk):
                         for i in self.__cards_to_discard:
                             self.__player += Card(next(self.deck))
                         
+                        # Cards not added to hand in order they are in discard pile
+                        # Animate discarded cards in separate for loop to avoid calling flip() in None
                         for i in self.__cards_to_discard:
                             self.after(ANIMATION_RATE * ANIMATION_RATE * i, self.__deal_card, self.__player.hand[i], i)
                         
@@ -342,7 +344,6 @@ class Game(Tk):
     
     def __reset(self):
         self.__player.clear()
-        self.__bet.set(0 if not self.__auto_bet.get() else self.__auto_bet_amount)
         self.__dealt = False
         self.__finished = False
         self.__score = None
@@ -354,6 +355,15 @@ class Game(Tk):
         
         # Save bank to file after every turn incase of unexpected program termination
         self.__player.save_bankroll()
+        
+        # If auto bet is set, check to make sure there are chips in player's bank
+        if self.__auto_bet.get() and self.__player.chips > 0:
+            if self.__auto_bet_amount > self.__player.chips:
+                self.__bet.set(self.__player.chips)
+            else:
+                self.__bet.set(self.__auto_bet_amount)
+        else:
+            self.__bet.set(0)
         
         self.__update_info()
     
