@@ -40,6 +40,8 @@ class Game(Tk):
         self.__dealt = False
         self.__bet = IntVar(self, 0)
         self.__wilds = BooleanVar(self, True)
+        self.__auto_bet = BooleanVar(self, False)
+        self.__auto_bet_amount = 0
         self.__running = False
         self.__finished = False
         self.__cards_to_discard = []
@@ -149,6 +151,9 @@ class Game(Tk):
         
         self.__wilds_checkbox = Checkbutton(self, text='DEUCES WILD', variable=self.__wilds, command=self.__check_wilds, style='TCheckbutton')
         self.__table.create_window(25, 25, window=self.__wilds_checkbox, anchor=NW)
+        
+        self.__auto_bet_checkbox = Checkbutton(self, text='AUTO BET', variable=self.__auto_bet, command=self.__set_auto_bet, style='TCheckbutton')
+        self.__table.create_window(25, 50, window=self.__auto_bet_checkbox, anchor=NW)
         
         self.__player_info_text = self.__table.create_text(700, 50, text=self.__player_info.get(), font=BLD_FONT)
         
@@ -337,7 +342,7 @@ class Game(Tk):
     
     def __reset(self):
         self.__player.clear()
-        self.__bet.set(0)
+        self.__bet.set(0 if not self.__auto_bet.get() else self.__auto_bet_amount)
         self.__dealt = False
         self.__finished = False
         self.__score = None
@@ -364,6 +369,18 @@ class Game(Tk):
                 self.__wilds.set(False)
             else:
                 self.__wilds.set(True)
+    
+    def __set_auto_bet(self):
+        if self.__running:
+            if self.__auto_bet.get() == True:
+                self.__auto_bet.set(False)
+            else:
+                self.__auto_bet.set(True)
+        else:
+            if self.__auto_bet.get():
+                self.__auto_bet_amount = simpledialog.askinteger('Auto Bet', 'How much would you like to auto bet', minvalue=0, maxvalue=50)
+                self.__bet.set(self.__auto_bet_amount if not self.__bet.get() else self.__bet.get())
+                self.__update_info()
     
     def __reset_selections(self):
         # Turn 'discard' into 'keep' and make text same color as background
